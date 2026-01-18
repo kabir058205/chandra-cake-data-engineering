@@ -2,20 +2,20 @@
 # DBTITLE 1,Cell 1
 import pandas as pd
 # Use the raw GitHub URL for the CSV file
-raw_url = "https://raw.githubusercontent.com/kabir058205/chandra-cake-data-engineering/main/data/material_purchase.csv"
+raw_url = "https://raw.githubusercontent.com/kabir058205/chandra-cake-data-engineering/main/data/material_master.csv"
 df = pd.read_csv(raw_url)
 
 
 # COMMAND ----------
 
 # DBTITLE 1,Cell 2
-df.head()
+display(spark.createDataFrame(df))
 
 # COMMAND ----------
 
 # DBTITLE 1,Save DataFrame as CSV to bronze volume
 # Save the DataFrame as CSV to a Unity Catalog volume (recommended for AWS serverless)
-bronze_path = "/Volumes/workspace/bronze/material_purchase/material_purchase.csv"
+bronze_path = "/Volumes/workspace/bronze/material_master/material_master.csv"
 df.to_csv(bronze_path, index=False)
 print(f"CSV file saved to {bronze_path}")
 
@@ -24,7 +24,7 @@ print(f"CSV file saved to {bronze_path}")
 # DBTITLE 1,Read CSV and store in bronze table
 from pyspark.sql.functions import current_timestamp, col, lit
 
-bronze_path = "/Volumes/workspace/bronze/material_purchase/material_purchase.csv"
+bronze_path = "/Volumes/workspace/bronze/material_master/material_master.csv"
 
 # Read CSV file using Spark
 spark_df = (
@@ -41,5 +41,5 @@ for col_name in spark_df.columns:
         spark_df = spark_df.drop(col_name)
 
 # Write to bronze table in Delta format
-spark_df.write.mode("append").format("delta").option("mergeSchema", "true").saveAsTable("bronze.material_purchase")
-print(f"Data from {bronze_path} loaded to bronze.material_purchase table.")
+spark_df.write.mode("append").format("delta").option("mergeSchema", "true").saveAsTable("bronze.material_master")
+print(f"Data from {bronze_path} loaded to bronze.material_master table.")
